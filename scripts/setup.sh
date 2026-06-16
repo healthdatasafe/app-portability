@@ -25,11 +25,19 @@ npm install
 if [ ! -d dist/.git ]
 then
   echo "
-Setting up 'dist' folder for publishing to GitHub pages...
+Setting up 'dist' folder for publishing to GitHub pages (dev)...
 "
   rm -rf dist
   git clone -b gh-pages git@github.com:healthdatasafe/app-portability.git dist || \
     echo "(gh-pages branch does not exist yet — first deploy will create it)"
+fi
+
+if [ ! -d distprod/.git ]
+then
+  echo "
+Setting up 'distprod' folder for publishing to production (portability.hds.ngo)...
+"
+  git clone git@github.com:healthdatasafe/app-portability-prod.git distprod
 fi
 
 echo "
