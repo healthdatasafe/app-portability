@@ -29,6 +29,7 @@ import * as webhooksExport from 'pryv-account-backup/src/methods/webhooks-export
 import { BrowserBlobZipStorageWriter } from '../lib/BrowserBlobZipStorageWriter';
 import { LocalStorageStateStore, type SyncStateSnapshot } from '../lib/LocalStorageStateStore';
 import { buildManifest, fetchDataModelCommit } from '../lib/hdsManifest';
+import { resolveUsernameFromEmail } from './auth';
 import { strToU8 } from 'fflate';
 
 export const APP_ID = 'hds-app-portability';
@@ -51,11 +52,12 @@ export type StepId = typeof RESOURCE_STEPS[number]['id'];
 export type StepStatus = 'pending' | 'active' | 'done' | 'skipped';
 
 export interface BackupOptions {
-  // Auth — exactly one of these two paths
-  serviceInfoUrl?: string;
-  username?: string;
-  password?: string;
-  apiEndpoint?: string;
+  // Auth — username-or-email + password. The username field also accepts an
+  // email; resolveUsernameFromEmail looks it up against the registration host
+  // (mirrors hds-webapp / app-web-auth3-hds).
+  serviceInfoUrl: string;
+  username: string;
+  password: string;
 
   // Configuration
   zipSizeMb: number;
@@ -234,24 +236,17 @@ export async function runBackup (
 // ─── Helpers ─────────────────────────────────────────────────────────────
 
 async function establishConnection (opts: BackupOptions): Promise<PryvConnection> {
-  if (opts.apiEndpoint) {
-    // HDS auth-flow return path — apiEndpoint already carries the token.
-    const connection = new (pryv as any).Connection(opts.apiEndpoint);
-    // Verify the token works by calling accessInfo (matches hds-webapp pattern)
-    const info: any = await connection.accessInfo();
-    if (info?.error) {
-      throw new Error('apiEndpoint is invalid or token expired — please sign in again.');
-    }
-    return connection;
+  if (!opts.serviceInfoUrl || !opts.username || !opts.password) {
+    throw new Error('serviceInfoUrl, username (or email), and password are required.');
   }
 
-  if (!opts.serviceInfoUrl || !opts.username || !opts.password) {
-    throw new Error('Either apiEndpoint or (serviceInfoUrl + username + password) must be provided.');
-  }
+  // Resolve email → username via the registration host if the user entered
+  // an email (mirrors hds-webapp + app-web-auth3-hds). No-op for bare usernames.
+  const username = await resolveUsernameFromEmail(opts.serviceInfoUrl, opts.username);
 
   const service = new (pryv as any).Service(opts.serviceInfoUrl);
   await service.info();
-  const connection = await service.login(opts.username, opts.password, APP_ID);
+  const connection = await service.login(username, opts.password, APP_ID);
   if (!connection || !connection.endpoint || !connection.token) {
     throw new Error('Login failed — if your account has MFA enabled, please use the CLI version.');
   }

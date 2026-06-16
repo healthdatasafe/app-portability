@@ -1,78 +1,39 @@
 /*
- * Auth helper — read-from-URL pattern for HDS apps.
+ * Email-or-username resolver — mirrors hds-webapp's AuthContext.login.
  *
- * Plan 77 D4: the portability app accepts a personal-token in URL on
- * return-from-auth (the same pattern used elsewhere in the HDS ecosystem,
- * e.g. via the app-web-auth3-hds flow). It also keeps an `apiEndpoint`-only
- * form so subjects who already have their endpoint URL can paste it.
+ * Pryv's API accepts usernames only. To let subjects sign in with the
+ * email they remember, we look the email up against the registration host
+ * (`<register>/<email>/uid`) and call the standard `service.login()` with
+ * the returned uid.
  *
- * Token-in-URL hygiene (security-sensitive):
- *  - Read once, clear from `window.location` (replaceState) so refresh or
- *    URL-share doesn't leak the token.
- *  - Never log to NR. Never persist outside `sessionStorage`.
+ * Returns the input unchanged when it's not an email. Throws
+ * `UNKNOWN_EMAIL` if no account is registered with the given email.
  */
 
-const URL_PARAM_ENDPOINT = 'apiEndpoint';
-const URL_PARAM_TOKEN_LEGACY = 'prYv-storage-token';
-const URL_PARAM_USERNAME_LEGACY = 'prYv-storage-username';
-const SESSION_KEY_API_ENDPOINT = 'hds-app-portability:apiEndpoint';
+import * as pryv from 'pryv';
 
-export interface AuthFromUrl {
-  apiEndpoint: string;
-  source: 'apiEndpoint-url' | 'legacy-token-pair' | 'session';
+interface PryvServiceInfo {
+  register?: string;
+  [k: string]: unknown;
 }
 
-/**
- * If the current URL contains a portability auth-return payload, extract
- * an apiEndpoint, cache it in sessionStorage, and remove it from the URL.
- * Returns null if no payload is present.
- *
- * Two accepted shapes:
- *   1. `?apiEndpoint=<URL-encoded apiEndpoint>` (preferred, HDS-native).
- *   2. `?prYv-storage-token=<token>&prYv-storage-username=<u>&...` (legacy
- *      Pryv auth-flow shape; reconstruct apiEndpoint from token + username +
- *      service info).
- */
-export function consumeAuthFromUrl (): AuthFromUrl | null {
-  if (typeof window === 'undefined') return null;
-  const url = new URL(window.location.href);
-  const fromEndpoint = url.searchParams.get(URL_PARAM_ENDPOINT);
-  const fromToken = url.searchParams.get(URL_PARAM_TOKEN_LEGACY);
+export async function resolveUsernameFromEmail (
+  serviceInfoUrl: string,
+  identifier: string
+): Promise<string> {
+  const trimmed = identifier.trim().toLowerCase();
+  if (!trimmed.includes('@')) return trimmed;
 
-  if (fromEndpoint) {
-    sessionStorage.setItem(SESSION_KEY_API_ENDPOINT, fromEndpoint);
-    clearAuthParams(url);
-    return { apiEndpoint: fromEndpoint, source: 'apiEndpoint-url' };
+  const service = new (pryv as any).Service(serviceInfoUrl);
+  const serviceInfo = (await service.info()) as PryvServiceInfo;
+  if (typeof serviceInfo.register !== 'string') {
+    throw new Error('UNKNOWN_EMAIL');
   }
 
-  if (fromToken) {
-    // Legacy reconstruction is left to the caller — we don't have a
-    // service-info URL on hand at module-eval time. Surface as best-effort:
-    // for now, just cache the raw token+username so the caller can decide
-    // what to do. (No HDS app currently delivers this shape in practice;
-    // documented for forward-compat.)
-    const username = url.searchParams.get(URL_PARAM_USERNAME_LEGACY) ?? '';
-    const synthetic = 'https://' + fromToken + '@' + username + '.api.datasafe.dev/';
-    sessionStorage.setItem(SESSION_KEY_API_ENDPOINT, synthetic);
-    clearAuthParams(url);
-    return { apiEndpoint: synthetic, source: 'legacy-token-pair' };
-  }
-
-  const cached = sessionStorage.getItem(SESSION_KEY_API_ENDPOINT);
-  if (cached) return { apiEndpoint: cached, source: 'session' };
-  return null;
-}
-
-function clearAuthParams (url: URL): void {
-  url.searchParams.delete(URL_PARAM_ENDPOINT);
-  url.searchParams.delete(URL_PARAM_TOKEN_LEGACY);
-  url.searchParams.delete(URL_PARAM_USERNAME_LEGACY);
-  // Replace history entry so token doesn't appear in back/forward / refresh.
-  window.history.replaceState({}, document.title, url.pathname + (url.search ? url.search : '') + url.hash);
-}
-
-/** Drop the cached apiEndpoint (logout). */
-export function clearStoredApiEndpoint (): void {
-  if (typeof window === 'undefined') return;
-  sessionStorage.removeItem(SESSION_KEY_API_ENDPOINT);
+  const lookupUrl = `${serviceInfo.register}${encodeURIComponent(trimmed)}/uid`;
+  const res = await fetch(lookupUrl, { headers: { Accept: 'application/json' } });
+  if (!res.ok) throw new Error('UNKNOWN_EMAIL');
+  const body = await res.json() as { uid?: string };
+  if (!body.uid) throw new Error('UNKNOWN_EMAIL');
+  return body.uid;
 }

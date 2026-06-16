@@ -11,7 +11,7 @@ describe('App', () => {
 
   it('renders the page heading', () => {
     render(<App />);
-    expect(screen.getByText('HDS — Download all my data', { selector: 'h1' })).toBeInTheDocument();
+    expect(screen.getByText('Download all my data', { selector: 'h1' })).toBeInTheDocument();
   });
 
   it('lists the legal frameworks the app implements', () => {
@@ -21,18 +21,9 @@ describe('App', () => {
     expect(screen.getByText(/Swiss nLPD Art\. 25/)).toBeInTheDocument();
   });
 
-  it('renders the login form by default (no URL params, no session cache)', () => {
+  it('renders the login form by default', () => {
     render(<App />);
     expect(screen.getByRole('button', { name: 'Start backup' })).toBeInTheDocument();
-    // The text-input named "Username" — disambiguates from the "Username + password" radio
-    expect(screen.getByRole('textbox', { name: /^Username$/i })).toBeInTheDocument();
-  });
-
-  it('preselects the apiEndpoint auth mode when arriving with ?apiEndpoint=...', () => {
-    const endpoint = 'https://tok@alice.api.example/';
-    window.history.replaceState({}, '', '/?apiEndpoint=' + encodeURIComponent(endpoint));
-    render(<App />);
-    const radio = screen.getByLabelText('API endpoint URL') as HTMLInputElement;
-    expect(radio.checked).toBe(true);
+    expect(screen.getByRole('textbox', { name: /Email or username/i })).toBeInTheDocument();
   });
 });

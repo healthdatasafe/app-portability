@@ -4,6 +4,12 @@ interface Props {
   onReset: () => void;
 }
 
+const SECTION_H2_CLS = 'mb-6 font-sans text-2xl font-light uppercase tracking-wide';
+const CARD_CLS = 'rounded-lg border border-[var(--hds-border)] bg-[var(--hds-card)] p-4 shadow-sm sm:p-6';
+const OUTLINE_BUTTON_CLS =
+  'rounded-lg border border-[var(--hds-border)] bg-[var(--hds-card)] px-5 py-2.5 text-sm font-medium ' +
+  'hover:bg-[var(--hds-muted)] focus:ring-4 focus:ring-[var(--hds-ring)] focus:outline-none';
+
 function prettyBytes (n: number): string {
   if (n > 1_000_000) return Math.round(n / 1_000_000) + ' MB';
   if (n > 1_000) return Math.round(n / 1_000) + ' KB';
@@ -12,8 +18,8 @@ function prettyBytes (n: number): string {
 
 export function ScreenDone ({ downloads, totalBytes, onReset }: Props) {
   return (
-    <section className='space-y-4 max-w-2xl w-full mx-auto'>
-      <h2 className='text-2xl font-bold'>Backup complete</h2>
+    <section className='space-y-6 max-w-2xl w-full mx-auto'>
+      <h2 className={SECTION_H2_CLS}>Backup complete</h2>
       <p className='text-sm'>
         Your data has been downloaded. <strong>Save the ZIP files together</strong> — restore reads
         them as one bundle. The last ZIP includes <code className='font-mono'>sync-state.json</code>
@@ -22,20 +28,18 @@ export function ScreenDone ({ downloads, totalBytes, onReset }: Props) {
         this page to make the next backup incremental.
       </p>
 
-      <div>
-        <h3 className='text-sm font-medium mb-2'>{downloads.length} ZIP file(s) — {prettyBytes(totalBytes)} total</h3>
-        <ul className='text-xs font-mono space-y-1 border border-border rounded-md p-3 bg-card'>
+      <div className={CARD_CLS}>
+        <h3 className='mb-3 text-lg font-normal italic'>
+          {downloads.length} ZIP file{downloads.length === 1 ? '' : 's'} — {prettyBytes(totalBytes)} total
+        </h3>
+        <ul className='text-xs font-mono space-y-1'>
           {downloads.map((d) => (
-            <li key={d.name}>{d.name} <span className='text-muted-foreground'>({prettyBytes(d.size)})</span></li>
+            <li key={d.name}>{d.name} <span className='text-[var(--hds-muted-foreground)]'>({prettyBytes(d.size)})</span></li>
           ))}
         </ul>
       </div>
 
-      <button
-        type='button'
-        onClick={onReset}
-        className='rounded-md border border-border px-4 py-2 text-sm hover:bg-accent'
-      >
+      <button type='button' onClick={onReset} className={OUTLINE_BUTTON_CLS}>
         Start a new backup
       </button>
     </section>
