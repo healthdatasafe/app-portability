@@ -1,0 +1,53 @@
+@import "tailwindcss";
+@import "hds-style/css/theme.css";
+@import "hds-style/css/palettes.css";
+
+/*
+ * Map semantic Tailwind color tokens to hds-style CSS variables so that
+ * Tailwind utility classes like bg-background, text-foreground, bg-card,
+ * border-border, text-muted-foreground, text-primary, etc. resolve to the
+ * active palette (palette-patient is the default for subject-facing apps;
+ * palette-dark activates from prefers-color-scheme).
+ */
+@theme {
+  --color-background: var(--hds-background);
+  --color-foreground: var(--hds-foreground);
+  --color-card: var(--hds-card);
+  --color-card-foreground: var(--hds-card-foreground);
+  --color-popover: var(--hds-card);
+  --color-popover-foreground: var(--hds-card-foreground);
+  --color-primary: var(--hds-primary);
+  --color-primary-foreground: var(--hds-primary-foreground);
+  --color-secondary: var(--hds-secondary);
+  --color-secondary-foreground: var(--hds-secondary-foreground);
+  --color-muted: var(--hds-muted);
+  --color-muted-foreground: var(--hds-muted-foreground);
+  --color-accent: var(--hds-accent);
+  --color-accent-foreground: var(--hds-accent-foreground);
+  --color-destructive: var(--hds-destructive);
+  --color-destructive-foreground: var(--hds-destructive-foreground);
+  --color-border: var(--hds-border);
+  --color-input: var(--hds-input);
+  --color-ring: var(--hds-ring);
+  --radius: 0.75rem;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 300;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Inter Tight', 'Inter', system-ui, sans-serif;
+  }
+  code, pre, .font-mono {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+}
+
+/* Logo: show the right variant based on active palette */
+.logo-light { display: block; }
+.logo-dark { display: none; }
+.palette-dark .logo-light { display: none; }
+.palette-dark .logo-dark { display: block; }

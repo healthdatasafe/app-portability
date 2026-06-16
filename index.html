@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" class="palette-patient">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HDS — Download all my data</title>
+    <meta name="description" content="Health Data Safe — download a portable copy of all the data in your HDS account (GDPR Art. 15/20, HIPAA §164.524, Swiss nLPD Art. 25)." />
+    <meta name="author" content="Health Data Safe" />
+
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" />
+    <script>
+      // Auto-switch to palette-dark when the OS prefers dark.
+      // Apps can later add a manual toggle that persists in localStorage.
+      (function () {
+        var saved = localStorage.getItem('palette');
+        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var palette = saved || (prefersDark ? 'palette-dark' : 'palette-patient');
+        var root = document.documentElement;
+        root.classList.remove('palette-doctor', 'palette-patient', 'palette-dark');
+        root.classList.add(palette);
+        if (palette === 'palette-dark') root.classList.add('dark');
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

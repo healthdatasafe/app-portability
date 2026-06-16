@@ -1,0 +1,60 @@
+{
+  "name": "app-portability",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "User-facing 'Download all my data' web app for HDS. Subject-side self-service for GDPR Art. 15/20, HIPAA §164.524, Swiss nLPD Art. 25.",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/healthdatasafe/app-portability"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "vite",
+    "dev:raw": "vite --mode raw",
+    "build": "vite build",
+    "preview": "vite preview",
+    "setup": "sh scripts/setup.sh",
+    "deploy": "bash scripts/deploy.sh",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "lint:change": "eslint $(git diff --name-only HEAD | grep -E '\\.(ts|tsx)$' | xargs)",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "fflate": "^0.8.2",
+    "hds-lib": "github:healthdatasafe/hds-lib-js",
+    "hds-style": "git+https://github.com/healthdatasafe/style-package.git",
+    "pryv": "^3.4.1",
+    "pryv-account-backup": "github:pryv/pryv-account-backup#v0.7.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "@tailwindcss/vite": "^4.0.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^22.5.5",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "eslint": "^9.9.0",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.9",
+    "globals": "^15.9.0",
+    "jsdom": "^28.0.0",
+    "neostandard": "^0.12.2",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.0.1",
+    "vite": "^5.4.1",
+    "vite-plugin-backloop.dev": "^1.0.4",
+    "vitest": "^4.0.18"
+  }
+}
