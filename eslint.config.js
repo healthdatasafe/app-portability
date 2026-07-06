@@ -5,7 +5,7 @@ import tseslint from 'typescript-eslint';
 import neostandard from 'neostandard';
 
 export default [
-  { ignores: ['dist', 'node_modules', 'coverage', '*.d.ts'] },
+  { ignores: ['dist', 'distprod', 'node_modules', 'coverage', '*.d.ts'] },
 
   ...neostandard({ semi: true }),
 
