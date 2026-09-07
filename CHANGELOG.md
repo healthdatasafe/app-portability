@@ -1,5 +1,33 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- **`backloop.dev` now installs from GitHub instead of npm** (2026-09-07). The service stopped
+  being public on 2026-09-04: a certificate authority must revoke any certificate whose private
+  key is published, and both did. The two packages also moved into repositories of their own, so
+  both are now pinned by tag.
+
+  ```
+  backloop.dev             git+https://github.com/perki/backloop.dev-node.git#v5.1.0
+  vite-plugin-backloop.dev git+https://github.com/perki/backloop.dev-vite.git#v2.2.0
+  ```
+
+  5.1.0 rather than 5.0.0 is deliberate. 5.0.0 fails to start when no secret is configured;
+  5.1.0 falls back to a shared self-signed certificate, so local development still works without
+  one. That certificate installs once per machine from <https://backloop.dev/public/>, and
+  Firefox will not accept it because it ignores the system trust store. To use your own
+  certificate instead, point `BACKLOOP_DEV_CERT` and `BACKLOOP_DEV_KEY` at the PEM files.
+
+  **One-time step in every existing checkout.** npm does not replace a package that moved from
+  the registry to a git URL: it leaves the old directory on disk while `npm ls` and
+  `package-lock.json` both report the new version, so the old code keeps loading.
+
+  ```sh
+  rm -rf node_modules/backloop.dev node_modules/vite-plugin-backloop.dev && npm install
+  ```
+
 ## 0.1.0 — 2026-06-16
 
 Initial release. Live at <https://portability.hds.ngo> (dev: <https://demo-portability.datasafe.dev>).
