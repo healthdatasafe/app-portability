@@ -7,3 +7,6 @@ coverage/
 .env.local
 .DS_Store
 .vite/
+
+# The backloop.dev secret is never committed (plan 95).
+backloop.dev.json

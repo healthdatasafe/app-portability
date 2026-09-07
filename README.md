@@ -8,6 +8,31 @@ Subjects sign in to their HDS account, configure backup options, and download a 
 
 Phase 2 scaffold (plan [`77-app-portability`](https://github.com/healthdatasafe/_macro/issues)). Login + backup runner ship in Phase 3.
 
+## HTTPS for local development
+
+The dev server runs over HTTPS on a `*.backloop.dev` hostname, which resolves to `127.0.0.1`.
+Certificates come from the [`backloop.dev`](https://github.com/perki/backloop.dev-node) package,
+installed directly from GitHub rather than npm.
+
+**You need nothing to get started.** With no configuration the package downloads a shared,
+self-signed certificate. Install it once per machine by following
+<https://backloop.dev/public/>, and the browser warning goes away.
+
+Two things worth knowing:
+
+- **Firefox will not accept it**, because it ignores the system trust store. Use a Chromium-based
+  browser, or supply your own certificate.
+- **Bring your own certificate** from mkcert, Caddy, a company CA or openssl: point
+  `BACKLOOP_DEV_CERT` and `BACKLOOP_DEV_KEY` at the PEM files and nothing is downloaded.
+
+If you are updating an existing checkout, delete the stale copy first. npm does not replace a
+package that moved from the registry to a git URL: it leaves the old directory in place while
+`npm ls` reports the new version.
+
+```sh
+rm -rf node_modules/backloop.dev node_modules/vite-plugin-backloop.dev && npm install
+```
+
 ## Deployments
 
 - **Dev:** [demo-portability.datasafe.dev](https://demo-portability.datasafe.dev) — gh-pages branch on this repo.
