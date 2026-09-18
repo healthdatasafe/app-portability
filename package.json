@@ -30,7 +30,7 @@
     "fflate": "^0.8.2",
     "hds-lib": "github:healthdatasafe/hds-lib-js",
     "hds-style": "git+https://github.com/healthdatasafe/style-package.git",
-    "pryv": "3.12.0",
+    "pryv": "3.13.0",
     "pryv-account-backup": "github:pryv/pryv-account-backup#v0.7.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
