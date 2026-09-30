@@ -4,6 +4,10 @@
 
 ### Changed
 
+- **hds-lib 2.6.5** (2026-09-30): `@pryv/cmc` 3.17.0 (popup-mode `requestAccept` / `requestScopeUpdate` ignore messages that do not come from their popup; optional `expectedOrigin`; `dataGrantApiEndpoint` dropped from the accept-result types).
+
+### Changed
+
 - **`backloop.dev` now installs from GitHub instead of npm** (2026-09-07). The service stopped
   being public on 2026-09-04: a certificate authority must revoke any certificate whose private
   key is published, and both did. The two packages also moved into repositories of their own, so
