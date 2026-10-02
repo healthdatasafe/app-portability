@@ -6,9 +6,6 @@
 
 - **hds-lib 2.8.0** and **pryv 3.14.2** (2026-10-02): hds-lib pinned to the `2.8.0` tag (was untagged `main`); `pryv` 3.13.0 → 3.14.2 (exact). Single deduped `pryv` 3.14.2 copy, shared by `pryv-account-backup`.
 - **hds-lib 2.6.5** (2026-09-30): `@pryv/cmc` 3.17.0 (popup-mode `requestAccept` / `requestScopeUpdate` ignore messages that do not come from their popup; optional `expectedOrigin`; `dataGrantApiEndpoint` dropped from the accept-result types).
-
-### Changed
-
 - **`backloop.dev` now installs from GitHub instead of npm** (2026-09-07). The service stopped
   being public on 2026-09-04: a certificate authority must revoke any certificate whose private
   key is published, and both did. The two packages also moved into repositories of their own, so
