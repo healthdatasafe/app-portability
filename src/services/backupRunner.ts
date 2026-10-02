@@ -11,19 +11,12 @@
  */
 
 import * as pryv from 'pryv';
-// @ts-expect-error — JS module without bundled .d.ts
 import apiResources from 'pryv-account-backup/src/methods/api-resources.js';
-// @ts-expect-error — JS module without bundled .d.ts
 import * as eventsChunked from 'pryv-account-backup/src/methods/events-chunked.js';
-// @ts-expect-error — JS module without bundled .d.ts
 import * as auditAsEvents from 'pryv-account-backup/src/methods/audit-as-events.js';
-// @ts-expect-error — JS module without bundled .d.ts
 import * as accessesHistory from 'pryv-account-backup/src/methods/accesses-history.js';
-// @ts-expect-error — JS module without bundled .d.ts
 import * as attachments from 'pryv-account-backup/src/methods/attachments.js';
-// @ts-expect-error — JS module without bundled .d.ts
 import * as hfData from 'pryv-account-backup/src/methods/hf-data.js';
-// @ts-expect-error — JS module without bundled .d.ts
 import * as webhooksExport from 'pryv-account-backup/src/methods/webhooks-export.js';
 
 import { BrowserBlobZipStorageWriter } from '../lib/BrowserBlobZipStorageWriter';
@@ -138,14 +131,14 @@ export async function runBackup (
 
   // Step 2 — audit
   await runStep('audit', cb, () => callbackify(
-    (auditAsEvents as any).download,
+    auditAsEvents.download,
     connection, writer,
     { includeTrashed: opts.includeTrashed, modifiedSince: auditModifiedSince }
   ));
 
   // Step 3 — events with onEvents tee for attachment + series-event refs
   await runStep('events', cb, () => callbackify(
-    (eventsChunked as any).download,
+    eventsChunked.download,
     connection, writer,
     {
       includeTrashed: opts.includeTrashed,
@@ -163,7 +156,7 @@ export async function runBackup (
   // Step 5 — per-access history (opt-in)
   if (opts.includeAccessHistory) {
     await runStep('access-history', cb, () => callbackify(
-      (accessesHistory as any).download,
+      accessesHistory.download,
       connection, writer,
       writer.__accessesArray || []
     ));
@@ -174,7 +167,7 @@ export async function runBackup (
   // Step 6 — attachments drain (opt-in)
   if (opts.includeAttachments) {
     await runStep('attachments', cb, () => callbackify(
-      (attachments as any).download,
+      attachments.download,
       connection, writer, state, {}
     ));
   } else {
@@ -184,7 +177,7 @@ export async function runBackup (
   // Step 7 — HFS series drain (opt-out)
   if (opts.includeHfData) {
     await runStep('hf-data', cb, () => callbackify(
-      (hfData as any).download,
+      hfData.download,
       connection, writer, state, {}
     ));
   } else {
@@ -194,7 +187,7 @@ export async function runBackup (
   // Step 8 — webhooks drain (opt-out)
   if (opts.includeWebhooks) {
     await runStep('webhooks', cb, () => callbackify(
-      (webhooksExport as any).download,
+      webhooksExport.download,
       connection, writer, state, {}
     ));
   } else {
@@ -286,7 +279,7 @@ async function fetchMetadata (
 
   for (const item of resources) {
     await new Promise<void>((resolve, reject) => {
-      (apiResources as any).toJSONFile(
+      apiResources.toJSONFile(
         {
           writer,
           resource: item.res,
@@ -320,7 +313,7 @@ async function fetchAppProfiles (
   for (const access of accesses) {
     if (access.type !== 'app') continue;
     await new Promise<void>((resolve, reject) => {
-      (apiResources as any).toJSONFile(
+      apiResources.toJSONFile(
         {
           writer,
           resource: 'profile/app',
@@ -354,9 +347,9 @@ function pushEventRefs (state: LocalStorageStateStore, events: any[]): Promise<u
   }));
 }
 
-function pushWebhookRefs (state: LocalStorageStateStore, doc: any): Promise<unknown[]> {
+async function pushWebhookRefs (state: LocalStorageStateStore, doc: any): Promise<void> {
   const accesses = Array.isArray(doc.accesses) ? doc.accesses : [];
-  return Promise.all(accesses.map(async (a: any) => {
+  await Promise.all(accesses.map(async (a: any) => {
     if (!a || typeof a.token !== 'string' || a.token.length === 0) return;
     await state.pushRef('webhook', { key: a.id, accessId: a.id, token: a.token, type: a.type });
   }));

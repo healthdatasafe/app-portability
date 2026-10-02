@@ -33,6 +33,10 @@
   rm -rf node_modules/backloop.dev node_modules/vite-plugin-backloop.dev && npm install
   ```
 
+### Fixed
+
+- `typecheck` now checks the app and node configs (it compiled no file); fixed the 8 type errors it had been hiding in `backupRunner.ts`.
+
 ## 0.1.0 — 2026-06-16
 
 Initial release. Live at <https://portability.hds.ngo> (dev: <https://demo-portability.datasafe.dev>).
