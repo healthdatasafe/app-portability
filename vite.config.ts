@@ -39,10 +39,10 @@ export default defineConfig(({ mode }) => {
         stream: path.resolve(__dirname, './src/lib/node-stub.ts')
       },
       preserveSymlinks: true,
-      dedupe: ['hds-lib', 'react', 'react-dom']
+      dedupe: ['react', 'react-dom']
     },
     optimizeDeps: {
-      include: ['hds-lib', 'pryv', 'pryv-account-backup', 'fflate']
+      include: ['pryv', 'pryv-account-backup', 'fflate']
     }
   };
   if (mode !== 'raw') {

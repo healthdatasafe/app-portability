@@ -4,6 +4,10 @@
 
 ### Changed
 
+- **hds-lib dependency removed** (2026-10-08, B-2026-10-08-4). The app imported no hds-lib API (it signs in with
+  `pryv` directly), so the dependency only cost a commit and a deploy per hds-lib release. The production bundle is
+  byte-identical without it (`index-CmYguBlz.js`). `pryv` 3.17.0 stays the exact direct pin, shared by
+  `pryv-account-backup`; `vite.config.ts` no longer lists hds-lib in `dedupe` / `optimizeDeps.include`.
 - **hds-lib 2.15.0** and **pryv 3.17.0** (2026-10-08): `@pryv/cmc` 3.19.0; `pryv` 3.15.0 → 3.17.0 (exact). Single deduped `pryv` 3.17.0 copy, shared by `pryv-account-backup`. No source change: the app imports no hds-lib API, and it signs in with `Service.login` (username + password), so the pryv 3.16.0 sign-in state events and the 3.17.0 sign-in cookie changes do not apply.
 - **hds-lib 2.10.0** and **pryv 3.15.0** (2026-10-05): `@pryv/cmc` 3.17.1; `pryv` 3.14.2 → 3.15.0 (exact). Single deduped `pryv` 3.15.0 copy, shared by `pryv-account-backup`.
 - **hds-lib 2.8.0** and **pryv 3.14.2** (2026-10-02): hds-lib pinned to the `2.8.0` tag (was untagged `main`); `pryv` 3.13.0 → 3.14.2 (exact). Single deduped `pryv` 3.14.2 copy, shared by `pryv-account-backup`.
