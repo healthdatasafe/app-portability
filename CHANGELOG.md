@@ -4,6 +4,7 @@
 
 ### Changed
 
+- **hds-lib 2.15.0** and **pryv 3.17.0** (2026-10-08): `@pryv/cmc` 3.19.0; `pryv` 3.15.0 → 3.17.0 (exact). Single deduped `pryv` 3.17.0 copy, shared by `pryv-account-backup`. No source change: the app imports no hds-lib API, and it signs in with `Service.login` (username + password), so the pryv 3.16.0 sign-in state events and the 3.17.0 sign-in cookie changes do not apply.
 - **hds-lib 2.10.0** and **pryv 3.15.0** (2026-10-05): `@pryv/cmc` 3.17.1; `pryv` 3.14.2 → 3.15.0 (exact). Single deduped `pryv` 3.15.0 copy, shared by `pryv-account-backup`.
 - **hds-lib 2.8.0** and **pryv 3.14.2** (2026-10-02): hds-lib pinned to the `2.8.0` tag (was untagged `main`); `pryv` 3.13.0 → 3.14.2 (exact). Single deduped `pryv` 3.14.2 copy, shared by `pryv-account-backup`.
 - **hds-lib 2.6.5** (2026-09-30): `@pryv/cmc` 3.17.0 (popup-mode `requestAccept` / `requestScopeUpdate` ignore messages that do not come from their popup; optional `expectedOrigin`; `dataGrantApiEndpoint` dropped from the accept-result types).
