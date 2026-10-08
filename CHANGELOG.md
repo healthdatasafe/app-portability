@@ -4,6 +4,10 @@
 
 ### Changed
 
+- **pryv-account-backup v0.7.1 → v0.8.0** (2026-10-09). No behaviour change here: the seven method modules this app
+  imports only gained a `@license` header (the bundle differs by those comments). 0.8.0's changes are on the restore
+  side (refusals reported, account fields restored deliberately, incremental backups) and in the CLI (errors no
+  longer hang); no runtime dependency changed.
 - **hds-lib dependency removed** (2026-10-08, B-2026-10-08-4). The app imported no hds-lib API (it signs in with
   `pryv` directly), so the dependency only cost a commit and a deploy per hds-lib release. The production bundle is
   byte-identical without it (`index-CmYguBlz.js`). `pryv` 3.17.0 stays the exact direct pin, shared by
