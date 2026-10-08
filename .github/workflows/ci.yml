@@ -1,0 +1,47 @@
+name: App Portability CI
+# Every dependency resolves without credentials (style-package went public on 2026-10-08), so
+# no HDS_CI_TOKEN guard. All five steps below (npm ci, lint, typecheck, test, build) were run
+# on a clean clone with an empty HOME, no SSH key or agent and no git config before this
+# workflow was added; none is left out. Network note: backloop.dev's postinstall and the
+# vitest run (the vite plugin's config hook fires in serve mode) fetch the public
+# backloop.dev certificate from https://backloop.dev/public/.
+
+on:
+  pull_request:
+    branches:
+      - '*'
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      matrix:
+        node-version: [24.x]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Lint
+      run: npm run lint
+
+    - name: Typecheck
+      run: npm run typecheck
+
+    - name: Test
+      run: npm test
+
+    - name: Build
+      run: npm run build

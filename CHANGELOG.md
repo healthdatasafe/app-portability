@@ -2,9 +2,13 @@
 
 ## [Unreleased]
 
+### Added
+
+- **CI** (2026-10-08): GitHub Actions workflow `.github/workflows/ci.yml` runs `npm ci`, lint, typecheck, test and build on Node 24.x for every pull request and every push to `main`. All five were run on a clean clone with no credentials first; no gate is left out.
+
 ### Changed
 
-- **pryv-account-backup v0.7.1 → v0.8.0** (2026-10-09). No behaviour change here: the seven method modules this app
+- **pryv-account-backup v0.7.1 → v0.8.0** (2026-10-08). No behaviour change here: the seven method modules this app
   imports only gained a `@license` header (the bundle differs by those comments). 0.8.0's changes are on the restore
   side (refusals reported, account fields restored deliberately, incremental backups) and in the CLI (errors no
   longer hang); no runtime dependency changed.
