@@ -12,7 +12,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // patient's browser cannot be allow-listed, so it is removed, not configured.
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
   const config: any = {
     base: './',
     envPrefix: ['VITE_'],
@@ -45,7 +45,10 @@ export default defineConfig(({ mode }) => {
       include: ['pryv', 'pryv-account-backup', 'fflate']
     }
   };
-  if (mode !== 'raw') {
+  // https on *.backloop.dev is for the dev server only. Vitest also runs in
+  // 'serve' mode, and the plugin's config hook loads (and may download) the
+  // backloop.dev certificate, so tests and CI would depend on backloop.dev.
+  if (command === 'serve' && !process.env.VITEST && mode !== 'raw') {
     config.plugins.push(backloop('app-portability'));
   }
   return {

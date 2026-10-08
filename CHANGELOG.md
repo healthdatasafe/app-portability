@@ -8,6 +8,7 @@
 
 ### Changed
 
+- **backloop.dev plugin on the dev server only** (2026-10-08): `vite.config.ts` applies `vite-plugin-backloop.dev` only when the dev server runs (`command === 'serve'`, not under Vitest, not in `raw` mode). `npm test` no longer loads the backloop.dev certificate, so tests and CI no longer depend on backloop.dev being reachable. The production bundle is unchanged (`index-DPTUpRkL.js`).
 - **pryv-account-backup v0.7.1 → v0.8.0** (2026-10-08). No behaviour change here: the seven method modules this app
   imports only gained a `@license` header (the bundle differs by those comments). 0.8.0's changes are on the restore
   side (refusals reported, account fields restored deliberately, incremental backups) and in the CLI (errors no
