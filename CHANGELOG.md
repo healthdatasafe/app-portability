@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Security
+
+- `npm audit` 13 → 0 (7 high, all dev/build-time: vite, esbuild, postcss, nanoid, jsdom's undici): vite 5 → 6.4,
+  an override pinning `postcss-selector-parser` `^7.1.6` under `@tailwindcss/typography`, and `npm audit fix`. The
+  built app was checked in a browser (renders, no console errors).
+
 ### Added
 
 - **CI** (2026-10-08): GitHub Actions workflow `.github/workflows/ci.yml` runs `npm ci`, lint, typecheck, test and build on Node 24.x for every pull request and every push to `main`. All five were run on a clean clone with no credentials first; no gate is left out.

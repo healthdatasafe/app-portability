@@ -52,11 +52,14 @@
     "tailwindcss": "^4.0.0",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.1",
+    "vite": "^6.4.4",
     "vite-plugin-backloop.dev": "git+https://github.com/perki/backloop.dev-vite.git#v2.3.0",
     "vitest": "^4.0.18"
   },
   "overrides": {
-    "backloop.dev": "git+https://github.com/perki/backloop.dev-node.git#v5.2.1"
+    "backloop.dev": "git+https://github.com/perki/backloop.dev-node.git#v5.2.1",
+    "@tailwindcss/typography": {
+      "postcss-selector-parser": "^7.1.6"
+    }
   }
 }
