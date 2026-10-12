@@ -15,6 +15,14 @@
 ### Changed
 
 - **backloop.dev plugin on the dev server only** (2026-10-08): `vite.config.ts` applies `vite-plugin-backloop.dev` only when the dev server runs (`command === 'serve'`, not under Vitest, not in `raw` mode). `npm test` no longer loads the backloop.dev certificate, so tests and CI no longer depend on backloop.dev being reachable. The production bundle is unchanged (`index-DPTUpRkL.js`).
+- **pryv-account-backup v0.8.0 → v0.8.1** (2026-10-12): **incremental exports and the audit log are now complete.**
+  Up to 0.8.0, a request with no time range and no `limit` got the server's default of 20 rows, so an incremental
+  export carried at most 20 changed events and 20 deletions, and every export at most 20 audit rows. 0.8.1 reads them
+  in explicit pages. Checked on demo and prod test accounts: incremental events 20 → 161 (deletions 20 → 386), audit
+  20 → 695 and 20 → 15 112. An incremental audit run now writes `audit_logs-incremental-<ts>.json`, and incremental
+  runs include trashed events. As in upstream's own runner, the next run's `modifiedSince` threshold is taken from
+  the server clock (`/access-info` `meta.serverTime`, local clock as fallback) and passed to the audit step too.
+  The sync-state `toolVersion` now reads `0.8.1` (it still said `0.7.0`).
 - **pryv-account-backup v0.7.1 → v0.8.0** (2026-10-08). No behaviour change here: the seven method modules this app
   imports only gained a `@license` header (the bundle differs by those comments). 0.8.0's changes are on the restore
   side (refusals reported, account fields restored deliberately, incremental backups) and in the CLI (errors no

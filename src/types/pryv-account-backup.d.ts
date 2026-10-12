@@ -1,6 +1,6 @@
 /*
  * Local declarations for the pryv-account-backup method modules imported by
- * src/services/backupRunner.ts. The package (v0.7.1) ships plain CommonJS with
+ * src/services/backupRunner.ts. The package (v0.8.1) ships plain CommonJS with
  * no .d.ts; these mirror the JSDoc signatures in its src/methods/*.js.
  *
  * Every download/toJSONFile takes a node-style `callback (err)` and an
@@ -54,6 +54,7 @@ declare module 'pryv-account-backup/src/methods/events-chunked.js' {
       fromTime?: number;
       toTime?: number;
       chunkMonths?: number;
+      incrementalPageSize?: number;
       onEvents?: (events: any[]) => unknown;
     },
     callback: PryvAccountBackup.Callback,
@@ -65,10 +66,21 @@ declare module 'pryv-account-backup/src/methods/audit-as-events.js' {
   export function download (
     connection: PryvAccountBackup.Connection,
     writer: PryvAccountBackup.StorageWriter,
-    options: { includeTrashed?: boolean; modifiedSince?: number | null },
+    options: {
+      includeTrashed?: boolean;
+      modifiedSince?: number | null;
+      /** Stamps the incremental output file `audit_logs-incremental-<ts>.json`. */
+      runStartedAt?: number;
+      pageSize?: number;
+    },
     callback: PryvAccountBackup.Callback,
     log?: PryvAccountBackup.Log
   ): void;
+}
+
+declare module 'pryv-account-backup/src/methods/events-pager.js' {
+  /** The server's clock (`meta.serverTime` of `/access-info`, seconds), or null. */
+  export function serverTime (connection: PryvAccountBackup.Connection): Promise<number | null>;
 }
 
 declare module 'pryv-account-backup/src/methods/accesses-history.js' {

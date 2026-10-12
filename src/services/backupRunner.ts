@@ -14,6 +14,7 @@ import * as pryv from 'pryv';
 import apiResources from 'pryv-account-backup/src/methods/api-resources.js';
 import * as eventsChunked from 'pryv-account-backup/src/methods/events-chunked.js';
 import * as auditAsEvents from 'pryv-account-backup/src/methods/audit-as-events.js';
+import * as eventsPager from 'pryv-account-backup/src/methods/events-pager.js';
 import * as accessesHistory from 'pryv-account-backup/src/methods/accesses-history.js';
 import * as attachments from 'pryv-account-backup/src/methods/attachments.js';
 import * as hfData from 'pryv-account-backup/src/methods/hf-data.js';
@@ -28,7 +29,7 @@ import { strToU8 } from 'fflate';
 export const APP_ID = 'hds-app-portability';
 const SYNC_STATE_FILE = 'sync-state.json';
 const HDS_MANIFEST_FILE = 'hds-manifest.json';
-const TOOL_VERSION = '0.7.0'; // matches upstream pryv-account-backup pin
+const TOOL_VERSION = '0.8.1'; // matches upstream pryv-account-backup pin
 
 export const RESOURCE_STEPS = [
   { id: 'metadata', label: 'Account, streams, profile, accesses' },
@@ -107,7 +108,14 @@ export async function runBackup (
     onZipReady: (info) => cb.onZipReady?.(info)
   });
 
-  const runStartedAt = Math.floor(Date.now() / 1000);
+  // The next run's `modifiedSince` threshold, from the server's clock (as
+  // upstream's Backup.js): a client clock ahead of the server would otherwise
+  // skip changes the server stamps during this run.
+  let runStartedAt: number | null = null;
+  try {
+    runStartedAt = await eventsPager.serverTime(connection);
+  } catch { /* fall back to the local clock */ }
+  if (runStartedAt == null) runStartedAt = Math.floor(Date.now() / 1000);
   const priorRunAt = (await state.get('lastRunAt')) as number | undefined;
   const eventsModifiedSince = priorRunAt
     ? ((await state.get('events.lastModifiedSince')) as number | null)
@@ -133,7 +141,7 @@ export async function runBackup (
   await runStep('audit', cb, () => callbackify(
     auditAsEvents.download,
     connection, writer,
-    { includeTrashed: opts.includeTrashed, modifiedSince: auditModifiedSince }
+    { includeTrashed: opts.includeTrashed, modifiedSince: auditModifiedSince, runStartedAt }
   ));
 
   // Step 3 — events with onEvents tee for attachment + series-event refs
