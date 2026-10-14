@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Changed
+
+- **pryv-account-backup 0.8.2** (from 0.8.1, 2026-10-14). Incremental runs and the audit log are written page by
+  page; a run that fails part-way leaves a valid file marked `"incomplete": true` and does not advance its state.
+  `onEvents` now gets one batch per page: `pushEventRefs` already handles any batch, keyed per event. The browser ZIP
+  writer's `write()` never returns `false`, so the new `'drain'` wait never applies. Lint, typecheck, 29 tests, build.
+
 ### Security
 
 - `npm audit` 13 → 0 (7 high, all dev/build-time: vite, esbuild, postcss, nanoid, jsdom's undici): vite 5 → 6.4,
