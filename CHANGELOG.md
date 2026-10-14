@@ -7,7 +7,8 @@
 - **pryv-account-backup 0.8.2** (from 0.8.1, 2026-10-14). Incremental runs and the audit log are written page by
   page; a run that fails part-way leaves a valid file marked `"incomplete": true` and does not advance its state.
   `onEvents` now gets one batch per page: `pushEventRefs` already handles any batch, keyed per event. The browser ZIP
-  writer's `write()` never returns `false`, so the new `'drain'` wait never applies. Lint, typecheck, 29 tests, build.
+  writer's `write()` never returns `false`, so the new `'drain'` wait never applies. Lint, typecheck, 29 tests, build. Follow-up `31a6eb6`: the sync-state `toolVersion` now reads `0.8.2` (it still said `0.8.1`), and on demo the full
+  and incremental audit and incremental events files written page by page parse as complete JSON with `meta`.
 
 ### Security
 
@@ -22,12 +23,6 @@
 ### Changed
 
 - **backloop.dev plugin on the dev server only** (2026-10-08): `vite.config.ts` applies `vite-plugin-backloop.dev` only when the dev server runs (`command === 'serve'`, not under Vitest, not in `raw` mode). `npm test` no longer loads the backloop.dev certificate, so tests and CI no longer depend on backloop.dev being reachable. The production bundle is unchanged (`index-DPTUpRkL.js`).
-- **pryv-account-backup v0.8.1 → v0.8.2** (2026-10-14): incremental runs and the audit log are written page by page
-  instead of being held whole before writing, and a run that fails part-way leaves a valid JSON file marked
-  `incomplete: true` (the restore tool notes it). No change in what an export contains. The app's ZIP write stream
-  satisfies the new contract as is (its `write()` never returns `false`, so no `drain` wait; it has no `on()`), and it
-  still buffers each file in memory until `end()`. Checked on demo: full and incremental audit and incremental events
-  files parse, complete, with `meta`. `toolVersion` reads `0.8.2`.
 - **pryv-account-backup v0.8.0 → v0.8.1** (2026-10-12): **incremental exports and the audit log are now complete.**
   Up to 0.8.0, a request with no time range and no `limit` got the server's default of 20 rows, so an incremental
   export carried at most 20 changed events and 20 deletions, and every export at most 20 audit rows. 0.8.1 reads them
