@@ -4,6 +4,10 @@
 
 ### Changed
 
+- **pryv-account-backup 0.9.0** (from 0.8.2, 2026-10-29; upstream `8e11fc6`). Upstream changes are on the restore
+  side (a single attachment is uploaded back under its original file name), plus `engines` Node ≥ 20, an ESLint
+  gate and a style pass with no behaviour change; the download methods this app imports keep their signatures, and
+  the ZIP layout is unchanged. The sync-state `toolVersion` now reads `0.9.0`. Lint, typecheck, 29 tests, build.
 - **pryv-account-backup 0.8.2** (from 0.8.1, 2026-10-14). Incremental runs and the audit log are written page by
   page; a run that fails part-way leaves a valid file marked `"incomplete": true` and does not advance its state.
   `onEvents` now gets one batch per page: `pushEventRefs` already handles any batch, keyed per event. The browser ZIP

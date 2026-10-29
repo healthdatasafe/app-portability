@@ -1,6 +1,6 @@
 /*
  * Local declarations for the pryv-account-backup method modules imported by
- * src/services/backupRunner.ts. The package (v0.8.2) ships plain CommonJS with
+ * src/services/backupRunner.ts. The package (v0.9.0) ships plain CommonJS with
  * no .d.ts; these mirror the JSDoc signatures in its src/methods/*.js.
  *
  * Every download/toJSONFile takes a node-style `callback (err)` and an

@@ -29,7 +29,7 @@ import { strToU8 } from 'fflate';
 export const APP_ID = 'hds-app-portability';
 const SYNC_STATE_FILE = 'sync-state.json';
 const HDS_MANIFEST_FILE = 'hds-manifest.json';
-const TOOL_VERSION = '0.8.2'; // matches upstream pryv-account-backup pin
+const TOOL_VERSION = '0.9.0'; // matches upstream pryv-account-backup pin
 
 export const RESOURCE_STEPS = [
   { id: 'metadata', label: 'Account, streams, profile, accesses' },
