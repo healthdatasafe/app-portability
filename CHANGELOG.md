@@ -4,6 +4,9 @@
 
 ### Changed
 
+- **pryv 3.18.0** (from 3.17.0, 2026-11-04), deduped with pryv-account-backup's. `Connection#accessInfo()` now
+  rejects a refused token (pryv/lib-js#80); neither this app nor the backup methods it imports call it. Lint,
+  typecheck, 29 tests, build.
 - **pryv-account-backup 0.9.0** (from 0.8.2, 2026-10-29; upstream `8e11fc6`). Upstream changes are on the restore
   side (a single attachment is uploaded back under its original file name), plus `engines` Node ≥ 20, an ESLint
   gate and a style pass with no behaviour change; the download methods this app imports keep their signatures, and
