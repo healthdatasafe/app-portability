@@ -29,6 +29,17 @@ fi
 echo "Pulling origin/main..."
 git pull --ff-only origin main
 
+# Refuse a HEAD behind origin/main: a stale checkout would roll the deploy back (B-2026-11-06-2).
+git fetch -q origin main
+read -r AHEAD BEHIND <<< "$(git rev-list --left-right --count HEAD...origin/main)"
+if [ "$BEHIND" != "0" ]; then
+  echo "ERROR: HEAD is $BEHIND commit(s) behind origin/main. Run: git pull --ff-only origin main"
+  exit 1
+fi
+if [ "$AHEAD" != "0" ]; then
+  echo "WARNING: HEAD is $AHEAD commit(s) ahead of origin/main (not pushed)."
+fi
+
 COMMIT_SHORT="$(git rev-parse --short HEAD)"
 COMMIT_FULL="$(git rev-parse HEAD)"
 echo "Deploying commit $COMMIT_SHORT to production..."
