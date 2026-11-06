@@ -28,6 +28,17 @@ fi
 echo "Pulling origin/main..."
 git pull --ff-only origin main
 
+# Refuse a HEAD behind origin/main: a stale checkout would roll the deploy back (B-2026-11-06-2).
+git fetch -q origin main
+read -r AHEAD BEHIND <<< "$(git rev-list --left-right --count HEAD...origin/main)"
+if [ "$BEHIND" != "0" ]; then
+  echo "ERROR: HEAD is $BEHIND commit(s) behind origin/main. Run: git pull --ff-only origin main"
+  exit 1
+fi
+if [ "$AHEAD" != "0" ]; then
+  echo "WARNING: HEAD is $AHEAD commit(s) ahead of origin/main (not pushed)."
+fi
+
 # Refuse to build against a node_modules that does not match package-lock.json.
 # A dependency bump pulled from git but never `npm install`ed produces a bundle
 # linked against the OLD library while the source expects the new one - lint,
