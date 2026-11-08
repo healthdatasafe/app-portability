@@ -129,6 +129,9 @@ fi
 git -C distprod commit -m "deploy $COMMIT_SHORT ($COMMIT_FULL)"
 git -C distprod push
 
+# A push is not a deploy: wait until the site serves it (B-2026-11-06-12).
+"$scriptsFolder/verify-pages.sh" healthdatasafe/app-portability-prod portability.hds.ngo "$(git -C distprod rev-parse HEAD)" "$COMMIT_FULL"
+
 echo "Deployed $COMMIT_SHORT to production."
 echo "Live at: https://portability.hds.ngo"
 echo "(First-time deploy: GitHub Pages may need manual validation of the custom domain + Enforce HTTPS.)"

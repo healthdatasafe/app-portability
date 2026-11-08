@@ -76,6 +76,11 @@
 
 ### Fixed
 
+- **A deploy waits until the site serves it** (2026-11-08, B-2026-11-06-12): `scripts/deploy.sh` and `scripts/deploy-prod.sh` used to report success once
+  the Pages branch was pushed, even when GitHub's own Pages deploy then failed and the previous build kept serving.
+  It now runs `scripts/verify-pages.sh` (same helper as hds-webapp), which waits until the site's `version.json`
+  names the commit just built, re-runs a failed `pages-build-deployment` run once, and fails (non-zero, with the
+  run link) otherwise. `VERIFY_PAGES_TIMEOUT` (default 900 s).
 - `typecheck` now checks the app and node configs (it compiled no file); fixed the 8 type errors it had been hiding in `backupRunner.ts`.
 
 ## 0.1.0 — 2026-06-16

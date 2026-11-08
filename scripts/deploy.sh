@@ -107,5 +107,8 @@ fi
 git commit -m "Deploy $COMMIT_SHORT"
 git push origin gh-pages
 
+# A push is not a deploy: wait until the site serves it (B-2026-11-06-12).
+"$scriptsFolder/verify-pages.sh" healthdatasafe/app-portability demo-portability.datasafe.dev "$(git rev-parse HEAD)" "$COMMIT"
+
 echo "Deployed to gh-pages (commit: $COMMIT_SHORT)"
 echo "Live at: https://demo-portability.datasafe.dev"
