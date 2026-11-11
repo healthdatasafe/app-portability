@@ -4,6 +4,10 @@
 
 ### Changed
 
+- **`?serviceInfoUrl=` no longer takes any server on a deployed page** (2026-11-11, B-2026-11-11-2, security): a
+  link to portability.hds.ngo with `?serviceInfoUrl=<any server>` made the page send the username and password typed
+  here to that server's API, without ever showing the platform. The override now takes one of the two HDS
+  platforms; any http(s) URL only on a local dev host (`*.backloop.dev`). 4 tests.
 - **Reads the account app's hand-off** (2026-11-11, B-2026-10-28-11): the account app opens this page with
   `pryvServiceInfoUrl`, `backUrl` and `backLabel`, and it read only `?serviceInfoUrl=`. The header now offers "← Back
   to {label}" with the target's host next to it (http(s) only), and `pryvServiceInfoUrl` selects the platform when it
