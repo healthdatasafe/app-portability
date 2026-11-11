@@ -4,6 +4,12 @@
 
 ### Changed
 
+- **Reads the account app's hand-off** (2026-11-11, B-2026-10-28-11): the account app opens this page with
+  `pryvServiceInfoUrl`, `backUrl` and `backLabel`, and it read only `?serviceInfoUrl=`. The header now offers "← Back
+  to {label}" with the target's host next to it (http(s) only), and `pryvServiceInfoUrl` selects the platform when it
+  is one of the two HDS platforms; any other value is ignored, since a link can come from anywhere and the platform
+  decides where the password goes. `src/lib/handOff.ts`, 7 tests.
+
 - **pryv 3.18.0** (from 3.17.0, 2026-11-04), deduped with pryv-account-backup's. `Connection#accessInfo()` now
   rejects a refused token (pryv/lib-js#80); neither this app nor the backup methods it imports call it. Lint,
   typecheck, 29 tests, build.
