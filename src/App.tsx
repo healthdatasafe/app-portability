@@ -4,7 +4,7 @@ import { ScreenProgress } from './components/ScreenProgress';
 import { ScreenDone } from './components/ScreenDone';
 import { ScreenError } from './components/ScreenError';
 import { runBackup, RESOURCE_STEPS, type StepId, type StepStatus } from './services/backupRunner';
-import { SERVICE_INFO_URL, handOffServiceInfoUrl, parseBackTo } from './lib/handOff';
+import { SERVICE_INFO_URL, handOffServiceInfoUrl, overrideServiceInfoUrl, parseBackTo } from './lib/handOff';
 
 type Screen =
   | { kind: 'login' }
@@ -16,8 +16,8 @@ type Screen =
 // same build serves either env (no separate VITE_HDS_ENV pass needed for this lookup).
 function resolveServiceInfoUrl (): string {
   if (typeof window === 'undefined') return SERVICE_INFO_URL.dev;
-  // `?serviceInfoUrl=…` override (intended for testing other operators).
-  const override = new URL(window.location.href).searchParams.get('serviceInfoUrl');
+  // `?serviceInfoUrl=…` override (testing): an HDS platform, or anything on a local dev host
+  const override = overrideServiceInfoUrl(window.location.search, window.location.hostname);
   if (override) return override;
   // the account app's hand-off: one of the HDS platforms only
   const handOff = handOffServiceInfoUrl(window.location.search);

@@ -22,12 +22,34 @@ function normalized (raw: string): string | null {
   }
 }
 
-/** The hand-off platform when it is one of the HDS platforms, else null */
-export function handOffServiceInfoUrl (search: string): string | null {
-  const raw = new URLSearchParams(search).get('pryvServiceInfoUrl');
+function knownPlatform (raw: string | null): string | null {
   if (raw == null) return null;
   const wanted = normalized(raw);
   return Object.values(SERVICE_INFO_URL).find(known => normalized(known) === wanted) ?? null;
+}
+
+/** The hand-off platform when it is one of the HDS platforms, else null */
+export function handOffServiceInfoUrl (search: string): string | null {
+  return knownPlatform(new URLSearchParams(search).get('pryvServiceInfoUrl'));
+}
+
+/**
+ * The `?serviceInfoUrl=` override (testing another platform): one of the HDS platforms, or any http(s) URL when
+ * this page runs on a local dev host (`*.backloop.dev`). On a deployed page a link could otherwise send the password
+ * typed here to any server (B-2026-11-11-2).
+ */
+export function overrideServiceInfoUrl (search: string, hostname: string): string | null {
+  const raw = new URLSearchParams(search).get('serviceInfoUrl');
+  if (raw == null || raw === '') return null;
+  if (hostname === 'backloop.dev' || hostname.endsWith('.backloop.dev')) {
+    try {
+      const url = new URL(raw);
+      return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : null;
+    } catch {
+      return null;
+    }
+  }
+  return knownPlatform(raw);
 }
 
 export interface BackTo {
