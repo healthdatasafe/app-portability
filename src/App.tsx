@@ -4,6 +4,7 @@ import { ScreenProgress } from './components/ScreenProgress';
 import { ScreenDone } from './components/ScreenDone';
 import { ScreenError } from './components/ScreenError';
 import { runBackup, RESOURCE_STEPS, type StepId, type StepStatus } from './services/backupRunner';
+import { SERVICE_INFO_URL, handOffServiceInfoUrl, parseBackTo } from './lib/handOff';
 
 type Screen =
   | { kind: 'login' }
@@ -11,22 +12,16 @@ type Screen =
   | { kind: 'done'; downloads: Array<{ name: string; size: number }>; totalBytes: number }
   | { kind: 'error'; message: string };
 
-// HDS service-info URLs — must match `dev-deploy/config/apps.yml`:
-//   serviceInfoURL:
-//     dev:  https://demo.datasafe.dev/reg/service/info
-//     prod: https://reg.api.datasafe.dev/service/info
-// Selected by hostname at runtime; same build serves either env (no separate
-// VITE_HDS_ENV pass needed for this lookup).
-const SERVICE_INFO_URL = {
-  dev: 'https://demo.datasafe.dev/reg/service/info',
-  prod: 'https://reg.api.datasafe.dev/service/info'
-} as const;
-
+// HDS service-info URLs (`lib/handOff.ts`, as in `dev-deploy/config/apps.yml`), selected by hostname at runtime;
+// same build serves either env (no separate VITE_HDS_ENV pass needed for this lookup).
 function resolveServiceInfoUrl (): string {
   if (typeof window === 'undefined') return SERVICE_INFO_URL.dev;
   // `?serviceInfoUrl=…` override (intended for testing other operators).
   const override = new URL(window.location.href).searchParams.get('serviceInfoUrl');
   if (override) return override;
+  // the account app's hand-off: one of the HDS platforms only
+  const handOff = handOffServiceInfoUrl(window.location.search);
+  if (handOff) return handOff;
   // Prod hostnames live on `*.hds.ngo` (workspace-wide rule since 2026-06-11
   // — see `project_hds_ngo_domains` memory).
   const host = window.location.hostname;
@@ -49,6 +44,7 @@ export default function App () {
   const [status, setStatus] = useState('Connecting…');
   const [stepStatuses, setStepStatuses] = useState<StepMap>(initialStepMap);
   const [zipsReady, setZipsReady] = useState<Array<{ name: string; size: number }>>([]);
+  const [backTo] = useState(() => (typeof window === 'undefined' ? null : parseBackTo(window.location.search)));
 
   const onSubmitLogin = useCallback(async (opts: LoginSubmit) => {
     setStatus('Connecting…');
@@ -100,6 +96,12 @@ export default function App () {
               Self-service data portability · GDPR Art. 15 / 20 · HIPAA §164.524 · Swiss nLPD Art. 25
             </div>
           </div>
+          {backTo != null && (
+            <a href={backTo.url} className='ml-auto shrink-0 text-sm text-[var(--hds-primary)] hover:underline'>
+              ← Back to {backTo.label ?? backTo.host}
+              {backTo.label != null && <span className='ml-1 text-xs text-[var(--hds-muted-foreground)]'>({backTo.host})</span>}
+            </a>
+          )}
         </div>
       </nav>
 
