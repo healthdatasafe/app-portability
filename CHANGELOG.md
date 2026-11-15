@@ -4,6 +4,11 @@
 
 ### Changed
 
+- **hds-style 0.5.1** (from 0.2.5, 2026-11-15, plan 121): the app's copy of the `@theme` colour map is replaced by
+  `hds-style/css/tailwind-map.css`, which also brings the shared radii (`rounded` 1rem, `rounded-md` 0.75rem,
+  `rounded-lg` 1rem; was 0.75rem / Tailwind defaults). Patient palette v2 (background `#FAFAFA`, was mint) and lighter
+  dark primary with dark text on it (0.5.0, AA). Titles keep Inter Tight through `font-display`, since `font-sans` is
+  Inter now; the body's own Inter rule is dropped (the theme default).
 - **`?serviceInfoUrl=` no longer takes any server on a deployed page** (2026-11-11, B-2026-11-11-2, security): a
   link to portability.hds.ngo with `?serviceInfoUrl=<any server>` made the page send the username and password typed
   here to that server's API, without ever showing the platform. The override now takes one of the two HDS

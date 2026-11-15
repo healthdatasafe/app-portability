@@ -89,7 +89,7 @@ export default function App () {
             <img src='./hds-logo-white.svg' alt='Health Data Safe' className='h-10 logo-dark' />
           </a>
           <div className='min-w-0'>
-            <h1 className='font-sans text-lg font-light uppercase tracking-wide leading-tight'>
+            <h1 className='font-display text-lg font-light uppercase tracking-wide leading-tight'>
               Download all my data
             </h1>
             <div className='text-xs text-[var(--hds-muted-foreground)] truncate'>

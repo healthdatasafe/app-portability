@@ -15,7 +15,7 @@ function statusIcon (status: StepStatus): string {
   }
 }
 
-const SECTION_H2_CLS = 'mb-6 font-sans text-2xl font-light uppercase tracking-wide';
+const SECTION_H2_CLS = 'mb-6 font-display text-2xl font-light uppercase tracking-wide';
 const CARD_CLS = 'rounded-lg border border-[var(--hds-border)] bg-[var(--hds-card)] p-4 shadow-sm sm:p-6';
 
 export function ScreenProgress ({ status, stepStatuses, zipsReady }: Props) {

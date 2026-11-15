@@ -20,7 +20,7 @@ const FIELDSET_CLS = 'space-y-4 rounded-lg border border-[var(--hds-border)] bg-
 const PRIMARY_BUTTON_CLS =
   'w-full rounded-lg bg-[var(--hds-primary)] px-5 py-2.5 text-sm font-medium ' +
   'text-[var(--hds-primary-foreground)] hover:opacity-90 focus:ring-4 focus:ring-[var(--hds-ring)] focus:outline-none';
-const SECTION_H2_CLS = 'mb-6 font-sans text-2xl font-light uppercase tracking-wide';
+const SECTION_H2_CLS = 'mb-6 font-display text-2xl font-light uppercase tracking-wide';
 
 export function ScreenLogin ({ serviceInfoUrl, onSubmit }: Props) {
   const [username, setUsername] = useState('');
