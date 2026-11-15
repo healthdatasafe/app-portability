@@ -10,6 +10,8 @@
 
 ### Changed
 
+- **hds-style 0.5.2** (2026-11-15, plan 121): the sign-in fields' outline (`--hds-input`, `#848C97`) meets WCAG
+  1.4.11 at 3:1 (was 1.2:1 on the card in light). No code change.
 - **hds-style 0.5.1** (from 0.2.5, 2026-11-15, plan 121): the app's copy of the `@theme` colour map is replaced by
   `hds-style/css/tailwind-map.css`, which also brings the shared radii (`rounded` 1rem, `rounded-md` 0.75rem,
   `rounded-lg` 1rem; was 0.75rem / Tailwind defaults). Patient palette v2 (background `#FAFAFA`, was mint) and lighter
