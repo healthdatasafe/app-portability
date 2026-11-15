@@ -132,7 +132,7 @@ export function ScreenLogin ({ serviceInfoUrl, onSubmit }: Props) {
           <p className='text-xs text-[var(--hds-muted-foreground)]'>
             If your account has SMS multi-factor authentication enabled, use the
             {' '}
-            <a className='text-[var(--hds-primary)] hover:underline' href='https://github.com/pryv/pryv-account-backup' target='_blank' rel='noreferrer'>
+            <a className='text-[var(--hds-primary)] underline' href='https://github.com/pryv/pryv-account-backup' target='_blank' rel='noreferrer'>
               CLI version
             </a>
             {' '}— this app does not handle MFA challenges.

@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- **Inline links are underlined** (2026-11-15, B-2026-11-15-3, a11y): "CLI version" on the sign-in screen and the
+  footer's "source" and "pryv-account-backup" links were told apart from the surrounding text by colour only, at
+  1.06:1 in dark with hds-style 0.5.1 (axe `link-in-text-block`).
+
 ### Changed
 
 - **hds-style 0.5.1** (from 0.2.5, 2026-11-15, plan 121): the app's copy of the `@theme` colour map is replaced by
