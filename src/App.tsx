@@ -126,11 +126,11 @@ export default function App () {
       <footer className='border-t border-[var(--hds-border)] mt-8'>
         <div className='mx-auto max-w-7xl px-4 py-4 text-xs text-[var(--hds-muted-foreground)]'>
           Health Data Safe · BSD-3-Clause ·{' '}
-          <a href='https://github.com/healthdatasafe/app-portability' target='_blank' rel='noreferrer' className='text-[var(--hds-primary)] hover:underline'>
+          <a href='https://github.com/healthdatasafe/app-portability' target='_blank' rel='noreferrer' className='text-[var(--hds-primary)] underline'>
             source
           </a>
           {' '}· powered by{' '}
-          <a href='https://github.com/pryv/pryv-account-backup' target='_blank' rel='noreferrer' className='text-[var(--hds-primary)] hover:underline'>
+          <a href='https://github.com/pryv/pryv-account-backup' target='_blank' rel='noreferrer' className='text-[var(--hds-primary)] underline'>
             pryv-account-backup
           </a>
         </div>
