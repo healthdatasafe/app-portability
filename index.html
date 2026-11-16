@@ -13,7 +13,8 @@
       // Auto-switch to palette-dark when the OS prefers dark.
       // Apps can later add a manual toggle that persists in localStorage.
       (function () {
-        var saved = localStorage.getItem('palette');
+        var saved = null;
+        try { saved = localStorage.getItem('palette'); } catch (e) { /* storage blocked: follow the OS */ }
         var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
         var palette = saved || (prefersDark ? 'palette-dark' : 'palette-patient');
         var root = document.documentElement;

@@ -4,6 +4,12 @@
 
 ### Fixed
 
+- **Dark mode survives blocked storage** (2026-11-16): the palette script in `index.html` read `localStorage` without
+  a guard; where storage access throws (blocked site data) it stopped before choosing a palette, so the OS dark
+  preference was ignored. It now falls back to the OS preference.
+- **`deploy-prod.sh` leaves the demo checkout clean** (2026-11-16): the prod build lands in `dist/`, the demo's
+  gh-pages checkout, and left it dirty; the script now resets `dist/` to its gh-pages HEAD on exit.
+
 - **Inline links are underlined** (2026-11-15, B-2026-11-15-3, a11y): "CLI version" on the sign-in screen and the
   footer's "source" and "pryv-account-backup" links were told apart from the surrounding text by colour only, at
   1.06:1 in dark with hds-style 0.5.1 (axe `link-in-text-block`).
