@@ -99,7 +99,7 @@ export function ScreenLogin ({ serviceInfoUrl, onSubmit }: Props) {
       />
 
       {uploadError && (
-        <div role='alert' className='rounded-lg border border-[var(--hds-destructive)] bg-[var(--hds-destructive)]/10 px-4 py-3 text-sm text-[var(--hds-destructive)]'>
+        <div role='alert' className='rounded-lg border border-[var(--hds-destructive)] bg-[var(--hds-destructive)]/10 px-4 py-3 text-sm text-[var(--hds-destructive-text)]'>
           {uploadError}
         </div>
       )}
