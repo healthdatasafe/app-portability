@@ -87,6 +87,15 @@ if (drift.length) {
 if (linked.length || drift.length) process.exit(1);
 ')
 
+# The prod build lands in dist/, the demo's gh-pages checkout, and left it dirty. Put it back on any exit; only
+# when dist/ is its own checkout, so a reset never reaches this repo.
+restore_dist () {
+  if [ -d dist/.git ] && [ "$(git -C dist rev-parse --show-toplevel 2>/dev/null)" = "$(pwd)/dist" ]; then
+    git -C dist reset -q --hard
+    git -C dist clean -fdq
+  fi
+}
+trap restore_dist EXIT
 
 echo "Building (VITE_HDS_ENV=prod) ..."
 VITE_HDS_ENV=prod npm run build
