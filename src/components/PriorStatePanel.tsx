@@ -98,7 +98,7 @@ export function PriorStatePanel ({
             key={s.apiEndpoint}
             className={
               CARD_CLS +
-              (isForgotten ? ' border-[var(--hds-destructive)]/40 bg-[var(--hds-destructive)]/5 opacity-70' : '')
+              (isForgotten ? ' border-[var(--hds-destructive)]/40 bg-[var(--hds-destructive)]/5' : '')
             }
           >
             <h3 className='mb-2 text-lg font-normal italic break-all'>
