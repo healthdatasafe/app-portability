@@ -19,8 +19,9 @@
         var palette = saved || (prefersDark ? 'palette-dark' : 'palette-patient');
         var root = document.documentElement;
         root.classList.remove('palette-doctor', 'palette-patient', 'palette-dark');
-        root.classList.add(palette);
-        if (palette === 'palette-dark') root.classList.add('dark');
+        // Dark is the patient dark (teal): palette-patient stays, palette-dark on top (hds-style 0.5.0+).
+        if (palette === 'palette-dark') root.classList.add('palette-patient', 'palette-dark', 'dark');
+        else root.classList.add(palette);
       })();
     </script>
   </head>

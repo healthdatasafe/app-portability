@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Changed
+
+- **Dark mode is the patient dark (teal)** (2026-11-16): the palette script swapped `palette-patient` for
+  `palette-dark` alone, which showed the generic blue dark palette; it now keeps `palette-patient` and adds
+  `palette-dark`, as hds-webapp does (hds-style 0.5.0+). Light is unchanged.
+
 ### Fixed
 
 - **A forgotten saved state stays readable** (2026-11-16, a11y): its card was `opacity-70`, which faded the muted
