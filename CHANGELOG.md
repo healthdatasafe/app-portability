@@ -4,6 +4,10 @@
 
 ### Fixed
 
+- **A forgotten saved state stays readable** (2026-11-16, a11y): its card was `opacity-70`, which faded the muted
+  "Will be cleared at login." to 2.7:1 and the title to 4.0:1 in light. The red tint and border still mark it; the
+  opacity is gone (4.8:1 and 8.8:1).
+
 - **Dark mode survives blocked storage** (2026-11-16): the palette script in `index.html` read `localStorage` without
   a guard; where storage access throws (blocked site data) it stopped before choosing a palette, so the OS dark
   preference was ignored. It now falls back to the OS preference.
