@@ -10,6 +10,10 @@
 
 ### Changed
 
+- **hds-style 0.6.0** (2026-11-16, a11y): the error message on the error screen and the upload-error
+  alert on the sign-in screen take `--hds-destructive-text` (patient `#B91C1C`, dark `#F8B4B4`) on their 10% red
+  tint. Red on that tint was under AA in light: 4.0:1 (`#DC2626`), now 5.3:1. Dark already passed (6.2:1, now
+  8.9:1).
 - **hds-style 0.5.2** (2026-11-15, plan 121): the sign-in fields' outline (`--hds-input`, `#848C97`) meets WCAG
   1.4.11 at 3:1 (was 1.2:1 on the card in light). No code change.
 - **hds-style 0.5.1** (from 0.2.5, 2026-11-15, plan 121): the app's copy of the `@theme` colour map is replaced by

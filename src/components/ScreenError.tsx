@@ -14,7 +14,7 @@ export function ScreenError ({ message, onReset }: Props) {
     <section className='space-y-6 max-w-2xl w-full mx-auto' role='alert'>
       <h2 className={SECTION_H2_CLS}>Something went wrong</h2>
       <div className={CARD_CLS}>
-        <p className='text-sm break-words text-[var(--hds-destructive)]'>{message}</p>
+        <p className='text-sm break-words text-[var(--hds-destructive-text)]'>{message}</p>
       </div>
       <button type='button' onClick={onReset} className={OUTLINE_BUTTON_CLS}>
         Try again
