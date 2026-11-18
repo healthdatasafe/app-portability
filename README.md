@@ -128,4 +128,4 @@ Both must be wired into the `hds-dev` / `hds-prod` alert policies with email des
 
 ## License
 
-BSD-3-Clause. Acknowledges upstream [`pryv/pryv-account-backup`](https://github.com/pryv/pryv-account-backup) (BSD-3-Clause) and [`pryv/pryv-account-backup-webapp`](https://github.com/pryv/pryv-account-backup-webapp) (BSD-3-Clause).
+[BSD-3-Clause](LICENSE). Acknowledges upstream [`pryv/pryv-account-backup`](https://github.com/pryv/pryv-account-backup) (BSD-3-Clause) and [`pryv/pryv-account-backup-webapp`](https://github.com/pryv/pryv-account-backup-webapp) (BSD-3-Clause).

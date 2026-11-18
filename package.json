@@ -24,7 +24,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "lint:change": "eslint $(git diff --name-only HEAD | grep -E '\\.(ts|tsx)$' | xargs)",
-    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit"
+    "typecheck": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.node.json --noEmit",
+    "license": "source-licenser -c .licenser.yml ."
   },
   "dependencies": {
     "fflate": "^0.8.2",
@@ -49,6 +50,7 @@
     "globals": "^15.9.0",
     "jsdom": "^28.0.0",
     "neostandard": "^0.12.2",
+    "source-licenser": "^2.0.6",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
@@ -64,5 +66,6 @@
   },
   "allowScripts": {
     "github:perki/backloop.dev-node": true
-  }
+  },
+  "author": "Health Data Safe (https://www.healthdatasafe.org)"
 }
