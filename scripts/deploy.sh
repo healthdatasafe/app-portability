@@ -4,7 +4,7 @@ set -e
 # Deploy app-portability to gh-pages (dev) → demo-portability.datasafe.dev.
 # Adapted from dev-deploy/templates/deploy.sh.
 
-scriptsFolder=$(cd $(dirname "$0"); pwd)
+scriptsFolder=$(cd "$(dirname "$0")"; pwd)
 cd "$scriptsFolder/.."
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)

@@ -4,7 +4,7 @@
 # Adapted from hds-webapp/scripts/deploy-prod.sh.
 set -euo pipefail
 
-scriptsFolder=$(cd $(dirname "$0"); pwd)
+scriptsFolder=$(cd "$(dirname "$0")"; pwd)
 cd "$scriptsFolder/.."
 
 MAIN_BRANCH="main"
