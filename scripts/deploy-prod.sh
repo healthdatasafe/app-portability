@@ -44,13 +44,6 @@ COMMIT_SHORT="$(git rev-parse --short HEAD)"
 COMMIT_FULL="$(git rev-parse HEAD)"
 echo "Deploying commit $COMMIT_SHORT to production..."
 
-# Reset distprod/ to remote main HEAD so the deploy is idempotent regardless
-# of any leftover local state (per feedback_ghpages_deploy.md).
-echo "Resetting distprod/ to origin/main..."
-git -C distprod fetch origin main
-git -C distprod reset --hard origin/main
-git -C distprod clean -fdx -e .git -e docs
-
 # Refuse to build against a node_modules that does not match package-lock.json.
 # A dependency bump pulled from git but never `npm install`ed produces a bundle
 # linked against the OLD library while the source expects the new one - lint,
@@ -95,6 +88,14 @@ if [ ! -f "$LINK_GUARD" ]; then
   exit 1
 fi
 node "$LINK_GUARD" .
+
+# Reset distprod/ to remote main HEAD so the deploy is idempotent regardless
+# of any leftover local state (per feedback_ghpages_deploy.md).
+# Done after the checks above, so a refused deploy leaves distprod/ untouched.
+echo "Resetting distprod/ to origin/main..."
+git -C distprod fetch origin main
+git -C distprod reset --hard origin/main
+git -C distprod clean -fdx -e .git -e docs
 
 # The prod build lands in dist/, the demo's gh-pages checkout, and left it dirty. Put it back on any exit; only
 # when dist/ is its own checkout, so a reset never reaches this repo.
