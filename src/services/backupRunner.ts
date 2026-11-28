@@ -6,11 +6,10 @@
  *  - Wrapped in a class with progress callbacks (no DOM coupling).
  *  - HDS-specific `hds-manifest.json` emission alongside the upstream
  *    `backup-index.json` (per plan 77 D9).
- *  - Accepts either a username+password (matches upstream MFA caveat) or
- *    a pre-built apiEndpoint URL (HDS auth-flow return path, plan 77 D4).
+ *  - Takes a signed-in connection: the sign-in, with its multi-factor step,
+ *    runs on the login screen first (`./signIn.ts`).
  */
 
-import * as pryv from 'pryv';
 import apiResources from 'pryv-account-backup/src/methods/api-resources.js';
 import * as eventsChunked from 'pryv-account-backup/src/methods/events-chunked.js';
 import * as auditAsEvents from 'pryv-account-backup/src/methods/audit-as-events.js';
@@ -23,13 +22,11 @@ import * as webhooksExport from 'pryv-account-backup/src/methods/webhooks-export
 import { BrowserBlobZipStorageWriter } from '../lib/BrowserBlobZipStorageWriter';
 import { LocalStorageStateStore, type SyncStateSnapshot } from '../lib/LocalStorageStateStore';
 import { buildManifest, fetchDataModelCommit } from '../lib/hdsManifest';
-import { resolveUsernameFromEmail } from './auth';
 import { strToU8 } from 'fflate';
 
-export const APP_ID = 'hds-app-portability';
 const SYNC_STATE_FILE = 'sync-state.json';
 const HDS_MANIFEST_FILE = 'hds-manifest.json';
-const TOOL_VERSION = '0.9.0'; // matches upstream pryv-account-backup pin
+const TOOL_VERSION = '0.10.0'; // matches upstream pryv-account-backup pin
 
 export const RESOURCE_STEPS = [
   { id: 'metadata', label: 'Account, streams, profile, accesses' },
@@ -46,12 +43,8 @@ export type StepId = typeof RESOURCE_STEPS[number]['id'];
 export type StepStatus = 'pending' | 'active' | 'done' | 'skipped';
 
 export interface BackupOptions {
-  // Auth — username-or-email + password. The username field also accepts an
-  // email; resolveUsernameFromEmail looks it up against the registration host
-  // (mirrors hds-webapp / app-web-auth3-hds).
-  serviceInfoUrl: string;
-  username: string;
-  password: string;
+  // The signed-in connection (`signIn` / `verifyMfaCode` in ./signIn.ts).
+  connection: PryvConnection;
 
   // Configuration
   zipSizeMb: number;
@@ -74,7 +67,7 @@ export interface BackupCallbacks {
   onZipReady?: (info: { name: string; size: number }) => void;
 }
 
-interface PryvConnection {
+export interface PryvConnection {
   endpoint: string;
   apiEndpoint: string;
   token: string;
@@ -87,10 +80,7 @@ export async function runBackup (
   opts: BackupOptions,
   cb: BackupCallbacks = {}
 ): Promise<{ downloads: Array<{ name: string; size: number }>; totalBytes: number }> {
-  cb.onStatus?.('Connecting…');
-
-  const connection = await establishConnection(opts);
-
+  const connection = opts.connection;
   const apiEndpoint = connection.endpoint || connection.apiEndpoint;
 
   // Apply pre-login choices: forget-then-import-then-default.
@@ -235,24 +225,6 @@ export async function runBackup (
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────
-
-async function establishConnection (opts: BackupOptions): Promise<PryvConnection> {
-  if (!opts.serviceInfoUrl || !opts.username || !opts.password) {
-    throw new Error('serviceInfoUrl, username (or email), and password are required.');
-  }
-
-  // Resolve email → username via the registration host if the user entered
-  // an email (mirrors hds-webapp + app-web-auth3-hds). No-op for bare usernames.
-  const username = await resolveUsernameFromEmail(opts.serviceInfoUrl, opts.username);
-
-  const service = new (pryv as any).Service(opts.serviceInfoUrl);
-  await service.info();
-  const connection = await service.login(username, opts.password, APP_ID);
-  if (!connection || !connection.endpoint || !connection.token) {
-    throw new Error('Login failed — if your account has MFA enabled, please use the CLI version.');
-  }
-  return connection;
-}
 
 async function fetchMetadata (
   connection: PryvConnection,

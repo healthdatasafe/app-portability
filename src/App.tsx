@@ -65,6 +65,11 @@ export default function App () {
     }
   }, []);
 
+  const onSignInError = useCallback((err: unknown) => {
+    console.error('[app-portability] sign-in failed:', err);
+    setScreen({ kind: 'error', message: (err as Error)?.message ?? String(err) });
+  }, []);
+
   const onReset = useCallback(() => {
     setScreen({ kind: 'login' });
   }, []);
@@ -110,6 +115,7 @@ export default function App () {
           <ScreenLogin
             serviceInfoUrl={resolveServiceInfoUrl()}
             onSubmit={onSubmitLogin}
+            onError={onSignInError}
           />
         )}
         {screen.kind === 'progress' && (

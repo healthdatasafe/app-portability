@@ -64,7 +64,7 @@ React 19 + Vite + TypeScript strict + Tailwind v4 + [hds-style](https://github.c
 
 The app takes one of two auth paths:
 
-1. **Username + password (default)** — same flow as upstream `pryv-account-backup-webapp`. The app calls `Pryv.Service.login(username, password, 'hds-app-portability')` which returns a **personal token** with full read access to the subject's account. SMS-MFA accounts cannot use this path — they're directed to the CLI version (same caveat as upstream).
+1. **Username + password (default)** — same flow as upstream `pryv-account-backup-webapp`. The app calls `Pryv.Service.login(username, password, 'hds-app-portability')` which returns a **personal token** with full read access to the subject's account. For an account with multi-factor authentication active, `login` throws `MfaRequiredError`; the form then asks for the code from the authenticator app (TOTP) or the code sent by SMS and completes the sign-in with `Service.mfaVerify` (same flow as upstream webapp 0.3.0, `src/services/signIn.ts`). Recovery codes are not accepted.
 2. **`apiEndpoint` URL** — subjects who already have an `apiEndpoint` URL (carrying a long-lived token) from another HDS app can paste it. Also accepted as a `?apiEndpoint=...` query parameter on return from an auth-flow redirect (HDS pattern, plan 77 D4). The query parameter is scrubbed from `window.location` immediately and cached in `sessionStorage` only — never logged to New Relic, never written outside `sessionStorage`.
 
 Resources read by the backup (per upstream `pryv-account-backup` library v0.7.0):

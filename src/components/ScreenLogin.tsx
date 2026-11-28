@@ -1,14 +1,33 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { LOST_FACTOR_HINT } from 'pryv-account-backup/src/lib/signInWithMfa.js';
 import { PriorStatePanel } from './PriorStatePanel';
 import type { SyncStateSnapshot } from '../lib/LocalStorageStateStore';
 import type { BackupOptions } from '../services/backupRunner';
+import { signIn, verifyMfaCode, resendMfaCode, mfaKind, type PendingMfa, type SignInResult, type MfaVerifyResult } from '../services/signIn';
 
 export interface LoginSubmit extends BackupOptions {}
 
 interface Props {
   serviceInfoUrl: string;
   onSubmit: (opts: LoginSubmit) => void;
+  /** A sign-in failure that the form cannot recover from (wrong password, unknown account, …). */
+  onError: (err: unknown) => void;
 }
+
+const MFA_TEXTS = {
+  totp: {
+    intro: 'This account uses multi-factor authentication. Enter the code shown by your authenticator app.',
+    label: 'Code from your authenticator app'
+  },
+  sms: {
+    intro: 'This account uses multi-factor authentication. Enter the code we sent you by SMS.',
+    label: 'Code sent by SMS'
+  },
+  other: {
+    intro: 'This account uses multi-factor authentication. Enter your verification code.',
+    label: 'Verification code'
+  }
+} as const;
 
 // Tailwind class fragments aligned with the HDS style guide
 // (style.datasafe.dev — see style/src/index.html for canonical shapes).
@@ -19,12 +38,27 @@ const LABEL_CLS = 'mb-2 block text-sm font-medium';
 const FIELDSET_CLS = 'space-y-4 rounded-lg border border-[var(--hds-border)] bg-[var(--hds-card)] p-4 shadow-sm sm:p-6';
 const PRIMARY_BUTTON_CLS =
   'w-full rounded-lg bg-[var(--hds-primary)] px-5 py-2.5 text-sm font-medium ' +
-  'text-[var(--hds-primary-foreground)] hover:opacity-90 focus:ring-4 focus:ring-[var(--hds-ring)] focus:outline-none';
+  'text-[var(--hds-primary-foreground)] hover:opacity-90 focus:ring-4 focus:ring-[var(--hds-ring)] focus:outline-none ' +
+  'disabled:opacity-60';
+const SECONDARY_BUTTON_CLS =
+  'rounded-lg border border-[var(--hds-input)] bg-[var(--hds-card)] px-3 py-1.5 text-sm font-medium ' +
+  'hover:bg-[var(--hds-muted)] focus:ring-4 focus:ring-[var(--hds-ring)] focus:outline-none disabled:opacity-60';
+const ERROR_BOX_CLS =
+  'rounded-lg border border-[var(--hds-destructive)] bg-[var(--hds-destructive)]/10 px-4 py-3 text-sm text-[var(--hds-destructive-text)]';
+const INFO_BOX_CLS = 'rounded-lg border border-[var(--hds-border)] bg-[var(--hds-muted)] px-4 py-3 text-sm';
 const SECTION_H2_CLS = 'mb-6 font-display text-2xl font-light uppercase tracking-wide';
 
-export function ScreenLogin ({ serviceInfoUrl, onSubmit }: Props) {
+export function ScreenLogin ({ serviceInfoUrl, onSubmit, onError }: Props) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  // The multi-factor step, while a code is awaited (see ../services/signIn.ts).
+  const [pendingMfa, setPendingMfa] = useState<PendingMfa | null>(null);
+  const pendingMfaRef = useRef<PendingMfa | null>(null);
+  const [mfaCode, setMfaCode] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [loginMessage, setLoginMessage] = useState<{ text: string; kind: 'error' | 'info' } | null>(null);
+  const mfaInputRef = useRef<HTMLInputElement>(null);
 
   const [zipSizeMb, setZipSizeMb] = useState(100);
   const [includeTrashed, setIncludeTrashed] = useState(false);
@@ -61,12 +95,77 @@ export function ScreenLogin ({ serviceInfoUrl, onSubmit }: Props) {
     });
   }
 
-  function handleSubmit (e: React.FormEvent<HTMLFormElement>) {
+  function startMfaStep (mfa: PendingMfa) {
+    pendingMfaRef.current = mfa;
+    setPendingMfa(mfa);
+    setMfaCode('');
+    setTimeout(() => mfaInputRef.current?.focus(), 0);
+  }
+
+  function endMfaStep () {
+    pendingMfaRef.current = null;
+    setPendingMfa(null);
+    setMfaCode('');
+  }
+
+  async function handleResend () {
+    const mfa = pendingMfaRef.current;
+    if (!mfa) return;
+    setBusy(true);
+    try {
+      await resendMfaCode(mfa);
+      if (pendingMfaRef.current === mfa) setLoginMessage({ text: 'A new code was sent by SMS.', kind: 'info' });
+    } catch (err) {
+      if (pendingMfaRef.current === mfa) {
+        setLoginMessage({ text: 'Could not send a new code: ' + ((err as Error).message || String(err)), kind: 'error' });
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function handleCancelMfa () {
+    endMfaStep();
+    setLoginMessage(null);
+  }
+
+  async function handleSubmit (e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (busy) return;
+    // While a sign-in call runs, the form's buttons are disabled, so the step cannot change under it.
+    setBusy(true);
+    setLoginMessage(null);
+    const mfa = pendingMfaRef.current;
+    let result: SignInResult | MfaVerifyResult;
+    try {
+      result = mfa ? await verifyMfaCode(mfa, mfaCode) : await signIn(serviceInfoUrl, username, password);
+    } catch (err) {
+      endMfaStep();
+      setBusy(false);
+      onError(err);
+      return;
+    }
+    setBusy(false);
+    if (mfa && pendingMfaRef.current !== mfa) return; // cancelled meanwhile
+    if (result.kind === 'mfa') {
+      startMfaStep(result.mfa);
+      return;
+    }
+    if (result.kind === 'retry') {
+      setMfaCode('');
+      setLoginMessage({ text: result.message, kind: 'error' });
+      mfaInputRef.current?.focus();
+      return;
+    }
+    if (result.kind === 'restart') {
+      endMfaStep();
+      setLoginMessage({ text: result.message, kind: 'error' });
+      return;
+    }
+    endMfaStep();
+    setPassword(''); // no longer needed once signed in
     onSubmit({
-      serviceInfoUrl,
-      username,
-      password,
+      connection: result.connection,
       zipSizeMb,
       includeTrashed,
       includeAttachments,
@@ -115,7 +214,7 @@ export function ScreenLogin ({ serviceInfoUrl, onSubmit }: Props) {
               autoCapitalize='none' autoCorrect='off' spellCheck={false}
               inputMode='email'
               placeholder='your.email@example.com or username'
-              value={username}
+              value={username} readOnly={pendingMfa != null}
               onChange={(e) => setUsername(e.target.value.toLowerCase())}
               className={INPUT_CLS}
             />
@@ -125,18 +224,47 @@ export function ScreenLogin ({ serviceInfoUrl, onSubmit }: Props) {
             <input
               id='password' name='password'
               type='password' required autoComplete='current-password'
-              value={password} onChange={(e) => setPassword(e.target.value)}
+              value={password} readOnly={pendingMfa != null}
+              onChange={(e) => setPassword(e.target.value)}
               className={INPUT_CLS}
             />
           </div>
-          <p className='text-xs text-[var(--hds-muted-foreground)]'>
-            If your account has SMS multi-factor authentication enabled, use the
-            {' '}
-            <a className='text-[var(--hds-primary)] underline' href='https://github.com/pryv/pryv-account-backup' target='_blank' rel='noreferrer'>
-              CLI version
-            </a>
-            {' '}— this app does not handle MFA challenges.
-          </p>
+          {pendingMfa != null && (
+            <div className='space-y-3 rounded-lg border border-[var(--hds-border)] bg-[var(--hds-muted)] p-4'>
+              <p className='text-sm'>{MFA_TEXTS[mfaKind(pendingMfa.method)].intro}</p>
+              <div>
+                <label className={LABEL_CLS} htmlFor='mfaCode'>{MFA_TEXTS[mfaKind(pendingMfa.method)].label}</label>
+                <input
+                  id='mfaCode' name='mfaCode' ref={mfaInputRef}
+                  type='text' required inputMode='numeric' autoComplete='one-time-code'
+                  value={mfaCode} onChange={(e) => setMfaCode(e.target.value)}
+                  className={INPUT_CLS}
+                />
+              </div>
+              <div className='flex gap-2'>
+                {mfaKind(pendingMfa.method) === 'sms' && (
+                  <button type='button' className={SECONDARY_BUTTON_CLS} disabled={busy} onClick={handleResend}>
+                    Send a new code
+                  </button>
+                )}
+                <button type='button' className={SECONDARY_BUTTON_CLS} disabled={busy} onClick={handleCancelMfa}>
+                  Cancel
+                </button>
+              </div>
+              <p className='text-xs text-[var(--hds-muted-foreground)]'>{LOST_FACTOR_HINT}</p>
+            </div>
+          )}
+          {loginMessage != null && (
+            <div role='alert' className={loginMessage.kind === 'info' ? INFO_BOX_CLS : ERROR_BOX_CLS}>
+              {loginMessage.text}
+            </div>
+          )}
+          {pendingMfa == null && (
+            <p className='text-xs text-[var(--hds-muted-foreground)]'>
+              If your account has multi-factor authentication active, you are asked for the code from your
+              authenticator app or the code sent by SMS after your password.
+            </p>
+          )}
         </fieldset>
 
         <details className='rounded-lg border border-[var(--hds-border)] bg-[var(--hds-card)] p-4 shadow-sm sm:p-6'>
@@ -199,14 +327,13 @@ export function ScreenLogin ({ serviceInfoUrl, onSubmit }: Props) {
           </div>
         </details>
 
-        <button type='submit' className={PRIMARY_BUTTON_CLS}>
-          Start backup
+        <button type='submit' className={PRIMARY_BUTTON_CLS} disabled={busy}>
+          {pendingMfa != null ? 'Verify code and start backup' : 'Start backup'}
         </button>
 
         <p className='text-xs text-[var(--hds-muted-foreground)]'>
-          Operator security note: the backup contains your account data including any MFA recovery codes.
-          Treat the downloaded files as sensitive — transport securely; consider rotating recovery codes
-          after disclosure.
+          Operator security note: the backup contains your account data, your whole account. Treat the
+          downloaded files as sensitive: transport them securely.
         </p>
       </form>
     </section>

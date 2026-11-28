@@ -2,6 +2,30 @@
 
 ## [Unreleased]
 
+## 0.2.0 — 2026-11-28
+
+### Added
+
+- **Sign in to accounts with multi-factor authentication** (2026-11-28, pryv-account-backup 0.10.0): an account with
+  MFA active could not be backed up here; the sign-in stopped and the page sent the person to the CLI. After the
+  password, the sign-in form now asks for the code from the authenticator app (TOTP) or the code sent by SMS, with a
+  "Send a new code" button for SMS. A wrong code can be retyped (3 attempts), an expired sign-in returns to the
+  password step, a network or rate-limit error keeps the code step open. Recovery codes are not accepted (on the
+  platform they turn MFA off). Ported from upstream `pryv-account-backup-webapp` 0.3.0 (`src/services/signIn.ts`);
+  it uses the library's `isMfaRequired` and `LOST_FACTOR_HINT`. The sign-in now runs on the sign-in screen before the
+  progress screen, and `runBackup` takes the signed-in connection.
+
+### Changed
+
+- **pryv-account-backup 0.10.0** (from 0.9.0, 2026-11-28): the resource fetchers the app imports
+  (`src/methods/*`) are unchanged, so the ZIP layout is the same and stays restorable with the 0.10.0 CLI (whose
+  restore now refuses a folder without `streams.json`; every backup from this app has one). `toolVersion` in
+  `sync-state.json` is 0.10.0.
+- **pryv 3.20.0** (from 3.18.0): `Service.login` throws `MfaRequiredError`, `Service.mfaVerify` /
+  `mfaChallenge`; the version pryv-account-backup 0.10.0 requires (one copy in the bundle).
+- **Security note on the sign-in screen**: the backup holds no usable MFA recovery codes (since open-pryv.io
+  2.0.0-rc.27), so the note no longer tells the person to rotate them; it says the files hold the whole account.
+
 ### Changed
 
 - **Dark mode is the patient dark (teal)** (2026-11-16): the palette script swapped `palette-patient` for

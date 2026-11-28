@@ -1,7 +1,8 @@
 /*
- * Local declarations for the pryv-account-backup method modules imported by
- * src/services/backupRunner.ts. The package (v0.9.0) ships plain CommonJS with
- * no .d.ts; these mirror the JSDoc signatures in its src/methods/*.js.
+ * Local declarations for the pryv-account-backup modules imported by
+ * src/services/backupRunner.ts and src/services/signIn.ts. The package
+ * (v0.10.0) ships plain CommonJS with no .d.ts; these mirror the JSDoc
+ * signatures in its src/methods/*.js and src/lib/signInWithMfa.js.
  *
  * Every download/toJSONFile takes a node-style `callback (err)` and an
  * optional `log (msg)`.
@@ -25,6 +26,12 @@ declare namespace PryvAccountBackup {
 
   type Callback = (err?: Error) => void;
   type Log = (msg: string) => void;
+}
+
+declare module 'pryv-account-backup/src/lib/signInWithMfa.js' {
+  /** Whether `err` is lib-js's `MfaRequiredError` (checked by name, carries an `mfaToken`). */
+  export function isMfaRequired (err: unknown): boolean;
+  export const LOST_FACTOR_HINT: string;
 }
 
 declare module 'pryv-account-backup/src/methods/api-resources.js' {
